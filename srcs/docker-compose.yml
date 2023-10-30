@@ -1,0 +1,66 @@
+version: '3.7'
+
+services:
+
+  mariadb:
+    build: ./requirements/mariadb
+    container_name: inc_mariadb
+    image: mariadb
+    expose:
+      - "3306"
+    networks:
+      - inception
+    env_file:
+      - .env
+    restart: always
+    volumes:
+      - db_data:/var/lib/mysql
+
+  wordpress:
+    build: ./requirements/wordpress
+    container_name: inc_wordpress
+    image: wordpress
+    expose:
+      - "9000"
+    depends_on:
+      - mariadb
+    networks:
+      - inception
+    env_file:
+      - .env
+    volumes:
+      - wp_data:/var/www/html/wordpress
+    restart: always
+
+  nginx:
+    build: ./requirements/nginx
+    container_name: inc_nginx
+    image: nginx
+    volumes:
+      - wp_data:/var/www/html/wordpress
+    env_file:
+      - .env
+    networks:
+      - inception
+    depends_on:
+      - wordpress
+    ports:
+      - "443:443"
+    restart: always
+
+networks:
+  inception:
+
+volumes:
+  db_data:
+      driver_opts:
+        type: 'none'
+        device: /home/abelahce/data/mariadb_volume
+        # device: /Users/abelahce/Desktop/oo
+        o: bind
+  wp_data:
+      driver_opts:
+        type: 'none'
+        device: /home/abelahce/data/wordpress_volume
+        # device: /Users/abelahce/Desktop/kk
+        o: bind

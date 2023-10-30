@@ -1,0 +1,11 @@
+FROM debian:bullseye
+
+RUN apt-get update && apt-get upgrade -y && apt-get install -y vim mariadb-server
+
+COPY ./tools/script.sh .
+
+RUN chmod 777 ./script.sh
+
+EXPOSE 3306
+
+CMD [ "./script.sh" ]
